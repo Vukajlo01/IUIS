@@ -33,38 +33,65 @@ namespace NetworkService
                 historyIndex++;
                 historyIndex = Math.Min(historyIndex, commandHistory.Count - 1);
                 Prompt.Text = commandHistory[commandHistory.Count - historyIndex - 1].ToString();
-            } else if (e.Key == Key.Down)
+            }
+            else if (e.Key == Key.Down)
             {
                 historyIndex--;
                 historyIndex = Math.Max(historyIndex, 0);
                 Prompt.Text = commandHistory[commandHistory.Count - historyIndex - 1].ToString();
-            } else if (e.Key == Key.Return)
+            }
+            else if (e.Key == Key.Return)
             {
                 commandHistory.Add(Prompt.Text);
                 Terminal.Text += "> " + Prompt.Text + "\n";
                 if (Prompt.Text.StartsWith("list"))
                 {
-                    foreach(Entity entity in Entities)
+                    foreach (Entity entity in Entities)
                     {
                         Terminal.Text += entity.ToString() + "\n";
                     }
-                } else if (Prompt.Text.StartsWith("add"))
+                }
+                else if (Prompt.Text.StartsWith("add"))
                 {
                     var words = Prompt.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (words.Length != 4) {
+                    if (words.Length == 4)
+                    {
                         if (int.TryParse(words[1], out _))
                         {
                             Entity entity = new Entity();
                             entity.Id = int.Parse(words[1]);
                             entity.Name = words[2];
-                            // entity.Type = words[3];
-                            // TODO: ________________
+                            entity.Type = new EntityType();
+                            entity.Type.Name = words[3];
                             Entities.Add(entity);
                         }
                     }
                 }
+                else if (Prompt.Text.StartsWith("del"))
+                {
+                    var words = Prompt.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (words.Length == 2)
+                    {
+                        if (int.TryParse(words[1], out _))
+                        {
+                            var toDelete = new List<Entity>();
+                            foreach (Entity entity in Entities)
+                            {
+                                if (entity.Id == int.Parse(words[1]))
+                                {
+                                    toDelete.Add(entity);
+                                }
+                            }
+
+                            foreach (Entity entity in toDelete)
+                            {
+                                Entities.Remove(entity);
+                            }
+                        }
+                    }
+                }
                 Prompt.Text = "";
-            } 
+            }
         }
     }
 }
